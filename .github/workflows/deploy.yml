@@ -31,10 +31,5 @@ jobs:
         with:
           project: "eiei114-deno-shiritori"
           image: "eiei114/shiritoridenoapp"
-          cmd:
-            - "run"
-            - "--allow-net"
-            - "--allow-read"
-            - "server.js"
-          project: "eiei114-deno-shiritori"
+          cmd: ["run", "--allow-net", "--allow-read", "server.js"]
           image: "eiei114/shiritoridenoapp:${{ github.sha }}"
