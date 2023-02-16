@@ -1,28 +1,25 @@
 <!DOCTYPE html>
 
-<html>
-
+<html lang="jp">
 
 <head>
-
     <meta charset="utf-8">
-
     <link rel="stylesheet" href="styles.css">
-
 </head>
 
-
 <body>
-
 <h1>しりとり</h1>
 <p id="previousWord"></p>
+<form>
+    <input id="nextWordInput" type="text" oninput="checkInput(this)"/>
+    <button id="nextWordSendButton">送信</button>
+</form>
 
-<input id="nextWordInput" type="text" />
+<h2>履歴</h2>
+<ul id="history"></ul>
 
-<button id="nextWordSendButton">送信</button>
 
 <script type="module">
-
     window.onload = async (event) => {
         const response = await fetch("/shiritori");
         const previousWord = await response.text();
@@ -30,11 +27,18 @@
         para.innerText = `前の単語：${previousWord}`;
 
         document.querySelector("#nextWordSendButton").onclick = async (event) => {
-            const nextWord = document.querySelector("#nextWordInput").value;
+            const input = document.querySelector("#nextWordInput");
+            const nextWord = input.value;
+            const invalidChars = nextWord.replace(/[ぁ-んー]/g, '');
+            if (invalidChars !== '') {
+                alert('ひらがな以外の文字が入力されています。');
+                input.value = '';
+                return;
+            }
             const response = await fetch("/shiritori", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nextWord })
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({nextWord})
             });
             if (response.status / 100 !== 2) {
                 alert(await response.text());
@@ -43,13 +47,13 @@
             const previousWord = await response.text();
             const para = document.querySelector("#previousWord");
             para.innerText = `前の単語：${previousWord}`;
-
+            input.value = '';
         };
     };
-
 </script>
 
-</body>
 
+
+</body>
 
 </html>
