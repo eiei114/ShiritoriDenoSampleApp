@@ -21,7 +21,7 @@ serve(async req => {
             return new Response("前の単語に続いていません。", { status: 400 });
         }
         previousWord = nextWord;
-        return new Response(previousWord);
+        return new Response((previousWord),{post: 8000});
     }
 
     return serveDir(req, {
