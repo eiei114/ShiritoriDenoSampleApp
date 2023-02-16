@@ -26,6 +26,15 @@
         const para = document.querySelector("#previousWord");
         para.innerText = `前の単語：${previousWord}`;
 
+        const responses = await fetch('/history');
+        const data = await responses.json();
+        const ul = document.querySelector('#history');
+        data.forEach(word => {
+            const li = document.createElement('li');
+            li.textContent = word;
+            ul.appendChild(li);
+        });
+
         document.querySelector("#nextWordSendButton").onclick = async (event) => {
             const input = document.querySelector("#nextWordInput");
             const nextWord = input.value;
@@ -51,8 +60,6 @@
         };
     };
 </script>
-
-
 
 </body>
 

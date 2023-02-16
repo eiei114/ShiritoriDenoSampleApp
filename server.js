@@ -11,8 +11,17 @@ serve(async req => {
     console.log(pathname);
 
     if (req.method === "GET" && pathname === "/shiritori") {
-        return new Response(previousWord,wordsList);
+        return new Response(previousWord);
     }
+
+    if (req.method === "GET" && pathname === "/history") {
+        return new Response(JSON.stringify(wordsList), {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    }
+
     if(req.method === "POST" && pathname === "/shiritori") {
         const requestJson = await req.json();
         const nextWord = requestJson.nextWord;
