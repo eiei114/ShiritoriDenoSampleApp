@@ -230,27 +230,27 @@ serve(async req => {
         return new Response(room3PreviousWord);
     }
 
-    if (req.method === "POST" && pathname === "/gameOverRoom1") {
+    if (req.method === "POST" && pathname === "/room1GameOver") {
         isGameOverRoom1 = true;
     }
 
-    if (req.method === "POST" && pathname === "/gameOverRoom2") {
+    if (req.method === "POST" && pathname === "/room2GameOver") {
         isGameOverRoom2 = true;
     }
 
-    if (req.method === "POST" && pathname === "/gameOverRoom3") {
+    if (req.method === "POST" && pathname === "/room3GameOver") {
         isGameOverRoom3 = true;
     }
 
-    if (req.method === "GET" && pathname === "/gameOverRoom1") {
+    if (req.method === "GET" && pathname === "/room1GameOver") {
         return new Response(isGameOverRoom1);
     }
 
-    if (req.method === "GET" && pathname === "/gameOverRoom2") {
+    if (req.method === "GET" && pathname === "/room2GameOver") {
         return new Response(isGameOverRoom2);
     }
 
-    if (req.method === "GET" && pathname === "/gameOverRoom3") {
+    if (req.method === "GET" && pathname === "/room3GameOver") {
         return new Response(isGameOverRoom3);
     }
 

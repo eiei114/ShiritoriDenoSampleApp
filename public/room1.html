@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="room.css">
     <title>しりとりゲーム</title>
 </head>
 <body>
@@ -67,7 +68,7 @@
     }
 
     async function UpdateIsGameOver() {
-        const response = await fetch('/gameOverRoom1'); //リクエスト
+        const response = await fetch('/room1GameOver'); //リクエスト
         const isGameOver = await response.json();
         if (isGameOver) {
             window.location.href = '/index.html';
@@ -127,7 +128,7 @@
         const button = document.querySelector("#nextWordSendButton");
         button.innerText = "ゲームオーバー";
         location.href = "index.html";
-        await fetch("gameOverRoom1", {method: "POST"});
+        await fetch("room1GameOver", {method: "POST"});
         await resetGame();
     }
 
