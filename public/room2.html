@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>しりとりゲーム</title>
+</head>
+<body>
+<div id="gameScreen">
+    <h1>しりとり</h1>
+    <p id="previousWord"></p>
+    <div>
+        <form>
+            <input id="nextWordInput" type="text" oninput="checkInput(this)"/>
+            <button id="nextWordSendButton">送信</button>
+        </form>
+    </div>
+    <div>
+        <button id="resetButton">リセット</button>
+    </div>
+    <div>
+        <h2>履歴</h2>
+        <ul id="history"></ul>
+    </div>
+</div>
+
+
+<script type="module">
+
+    window.onload = async () => {
+        await fetch("/room2CountUp" , {method: "POST"});
+        await updatePreviousWord();
+        await updateHistory();
+    };
+
+    window.addEventListener("beforeunload", function(event) {
+        fetch("/room2CountUp", {method: "DELETE"});
+    });
+
+    setInterval(async () => {
+        await updatePreviousWord();
+        await updateHistory();
+        await UpdateIsGameOver();
+    }, 1000);
+
+    // 共通処理の関数化
+    async function updatePreviousWord() {
+        const response = await fetch("/room2Init"); //リクエスト
+        const previousWord = await response.text(); //レスポンス
+        const para = document.querySelector("#previousWord");
+        para.innerText = `前の単語：${previousWord}`;
+    }
+
+
+
+    async function updateHistory() {
+        const response = await fetch('/room2History'); //リクエスト
+        const data = await response.json(); //レスポンス
+        const ul = document.querySelector('#history');
+        data.forEach(word => {
+            if (!ul.querySelector(`li[data-word="${word}"]`)) {
+                const li = document.createElement('li');
+                li.textContent = word;
+                li.dataset.word = word;
+                ul.appendChild(li);
+            }
+        });
+    }
+
+    async function UpdateIsGameOver() {
+        const response = await fetch('/gameOverRoom2'); //リクエスト
+        const isGameOver = await response.json();
+        if (isGameOver) {
+            window.location.href = '/index.html';
+        }else {
+            return;
+        }
+    }
+
+    async function resetGame() {
+        const response = await fetch("/room2Reset", {method: "POST"}); //リクエスト
+
+        if (response.status / 100 !== 2) {
+            alert(await response.text());
+            return;
+        }
+
+        const previousWord = await response.text(); //レスポンス
+        const para = document.querySelector("#previousWord");
+        para.innerText = `前の単語：${previousWord}`;
+        const ul = document.querySelector('#history');
+        ul.innerHTML = '';
+        await updateHistory();
+    }
+
+
+    // クリックイベント
+    document.querySelector("#nextWordSendButton").onclick = async (event) => {
+        const input = document.querySelector("#nextWordInput");
+        const nextWord = input.value;
+        const invalidChars = nextWord.replace(/[ぁ-んー]/g, '');
+        if (invalidChars !== '') {
+            alert('ひらがな以外の文字が入力されています。');
+            input.value = '';
+            return;
+        }
+        const response = await fetch("/room2Shiritori", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({nextWord})
+        }); //リクエスト
+        if (response.status / 100 !== 2) {
+            if (response.status === 400 && (await response.text()) === "「ん」で終わっています。") {
+                await showGameOver();
+                return;
+            }
+            alert(await response.text());
+            return;
+        }
+        input.value = '';
+    };
+
+    document.querySelector("#resetButton").onclick = resetGame;
+
+    // ゲームオーバー表示用の関数
+    async function showGameOver() {
+        const button = document.querySelector("#nextWordSendButton");
+        button.innerText = "ゲームオーバー";
+        location.href = "index.html";
+        await fetch("gameOverRoom2", {method: "POST"});
+        await resetGame();
+    }
+
+</script>
+</body>
+</html>
